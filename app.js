@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import express from "express";
 import morgan from "morgan"; // 어플리케이션에서 발생하는 모든 일을 logging 해주는 모듈
 import helmet from "helmet"; // 어플리케이션을 안전하게 만들어주는 모듈
 import cookieParser from "cookie-parser"; // Cookie를 관리해주는 모듈
 import bodyParser from "body-parser"; // 사용자가 웹사이트로 전달하는 정보들을 검사하는 모듈
 import passport from "passport";
+import session from "express-session";
 import { localsMiddleware } from "./middlewares";
 import routes from "./routes";
 import userRouter from "./routers/userRouter";
@@ -35,6 +37,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 // 어플리케이션을 logging 해주며, logging 의 범위를 설정할 수 있다
 
+app.use(
+    session({
+        // 세션 암호화
+        secret: process.env.COOKIE_SECRET,
+        resave: true,
+        saveUninitialized: false
+    })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
