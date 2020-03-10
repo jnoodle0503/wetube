@@ -15,4 +15,23 @@ export const localsMiddleware = (req, res, next) => {
   next();
 };
 
+// 경로 제한을 위한 미들웨어
+// 예를 들어, 로그인 상태에서 회원가입, 로그인 등등 경로 제한
+export const onlyPublic = (req, res, next) => {
+  if (req.user) {
+    res.redirect(routes.home);
+  } else {
+    next();
+  }
+};
+
+// 로그인 상태에서만 들어갈 수 있는 경로 설정
+export const onlyPrivate = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else {
+    res.redirect(routes.home);
+  }
+};
+
 export const uploadVideo = multerVideo.single("videoFile");
