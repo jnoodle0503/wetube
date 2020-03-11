@@ -2,10 +2,13 @@ import passport from "passport";
 import routes from "../routes";
 import User from "../models/User";
 
+// 회원가입 페이지
 export const getJoin = (req, res) => {
   res.render("join", { pageTitle: "Join" });
 };
 
+
+// 사용자 회원가입 DB 정보 생성
 export const postJoin = async (req, res, next) => {
   // console.log(req.body)
   // request 객체의 body 객체에 form을 통해 보낸 사용자의 정보들을 저장한다
@@ -35,6 +38,7 @@ export const postJoin = async (req, res, next) => {
   }
 };
 
+// 로그인 페이지
 export const getLogin = (req, res) =>
   res.render("login", { pageTitle: "Log In" });
 
@@ -76,10 +80,49 @@ export const githubLoginCallback = async (_, __, profile, cb) => {
   }
 };
 
+// Github 인증 성공 후 홈 화면으로...
 export const postGithubLogIn = (req, res) => {
   res.redirect(routes.home);
 };
 
+export const kakaoLogin = passport.authenticate("kakao");
+
+export const kakaoLoginCallback = async (_, __, kakaoProfile, cb) => {
+  const {
+    _json: {
+      id,
+      properties: { nickname: name },
+      kakao_account: {
+        profile: { profile_image_url: avatarUrl },
+        email
+      }
+    }
+  } = kakaoProfile;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      user.kakaoId = id;
+      user.save();
+      return cb(null, user);
+    }
+    const newUser = await User.create({
+      email,
+      name,
+      kakaoId: id,
+      avatarUrl
+    });
+    return cb(null, newUser);
+  } catch (error) {
+    return cb(error);
+  }
+};
+
+export const postKakaoLogin = (req, res) => {
+  res.redirect(routes.home);
+};
+
+// -----------------------------------  페이스북 격리  -----------------------------------------
 // Facebook 인증
 export const facebookLogin = passport.authenticate("facebook");
 
@@ -114,16 +157,20 @@ export const facebookLoginCallback = async (
 export const postFacebookLogin = (req, res) => {
   res.redirect(routes.home);
 };
+// -----------------------------------  페이스북 격리  -----------------------------------------
 
+// 로그아웃
 export const logout = (req, res) => {
   req.logout();
   res.redirect(routes.home);
 };
 
+// 사용자 정보
 export const getMe = (req, res) => {
   res.render("userDetail", { pageTitle: "User Detail", user: req.user });
 };
 
+// 사용자 정보
 export const userDetail = async (req, res) => {
   const {
     param: { id }
@@ -136,8 +183,10 @@ export const userDetail = async (req, res) => {
   }
 };
 
+// 프로필 수정
 export const editProfile = (req, res) =>
   res.render("editProfile", { pageTitle: "Edit Profile" });
 
+// 비밀번호 변경
 export const changePassword = (req, res) =>
   res.render("changePassword", { pageTitle: "Change Password" });

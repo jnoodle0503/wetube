@@ -2,8 +2,9 @@
 import passport from "passport";
 import GithubStrategy from "passport-github";
 import FacebookStrategy from "passport-facebook";
+import KakaoStrategy from "passport-kakao";
 import User from "./models/User";
-import { githubLoginCallback, facebookLoginCallback } from "./controllers/userController";
+import { githubLoginCallback, facebookLoginCallback, kakaoLoginCallback } from "./controllers/userController";
 import routes from "./routes";
 
 // 이봐, passport 야! strategy 를 하나 사용해!
@@ -24,6 +25,18 @@ passport.use(
     )
 );
 
+passport.use(
+    new KakaoStrategy(
+        {
+            clientID: process.env.KA_ID,
+            clientSecret: "",
+            callbackURL: "http://localhost:4000/oauth"
+        },
+        kakaoLoginCallback
+    )
+);
+
+// -----------------------------------  페이스북 격리  -----------------------------------------
 // 아래는 Facebook 인증 방식
 passport.use(
     new FacebookStrategy(
@@ -37,6 +50,8 @@ passport.use(
         facebookLoginCallback
     )
 );
+// -----------------------------------  페이스북 격리  -----------------------------------------
+
 
 /*
 아래 코드를 사용했을 때 에러가 났다

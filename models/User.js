@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
   email: String,
   avatarUrl: String,
   facebookId: Number,
-  githubId: Number
+  githubId: Number,
+  kakaoId: Number
 });
 
 // 스키마 생성 후 passport-local-mongoose 모듈을 사용하기 위해선
