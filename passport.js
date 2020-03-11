@@ -1,23 +1,41 @@
+/* eslint-disable prettier/prettier */
 import passport from "passport";
 import GithubStrategy from "passport-github";
+import FacebookStrategy from "passport-facebook";
 import User from "./models/User";
-import { githubLoginCallback } from "./controllers/userController";
+import { githubLoginCallback, facebookLoginCallback } from "./controllers/userController";
 import routes from "./routes";
 
 // 이봐, passport 야! strategy 를 하나 사용해!
 // strategy 란 로그인하는 방법이다
 // 예를 들어, 사용자이름과 이메일로그인, 페이스북 로그인, 깃헙 로그인 등등...
+// 아래는 local 방식(username 과 email 인증 방식)
 passport.use(User.createStrategy());
 
+// 아래는 Github 인증 방식
 passport.use(
-  new GithubStrategy(
-    {
-      clientID: process.env.GH_ID,
-      clientSecret: process.env.GH_SECRET,
-      callbackURL: `http://localhost:4000${routes.githubCallback}`
-    },
-    githubLoginCallback
-  )
+    new GithubStrategy(
+        {
+            clientID: process.env.GH_ID,
+            clientSecret: process.env.GH_SECRET,
+            callbackURL: `http://localhost:4000${routes.githubCallback}`
+        },
+        githubLoginCallback
+    )
+);
+
+// 아래는 Facebook 인증 방식
+passport.use(
+    new FacebookStrategy(
+        {
+            clientID: process.env.FB_ID,
+            clientSecret: process.env.FB_SECRET,
+            callbackURL: `http://localhost:4000${routes.facebookCallback}`,
+            profileFields: ["id", "displayName", "photos", "email"],
+            scope: ["public_profile", "email"]
+        },
+        facebookLoginCallback
+    )
 );
 
 /*

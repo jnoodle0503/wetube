@@ -44,14 +44,16 @@ export const postLogin = passport.authenticate("local", {
   successRedirect: routes.home
 });
 
-// 사용자를 github 로 보내주는 과정 (github 페이지에서 로그인)
+// 사용자를 github 로 보내주는 과정 (github 에 인증요청)
+// github 에 인증요청을 마친 후, github 에서는 callbakc URL 을 보내준다
+// 여기선 /auth/github/callback 이주소다
 export const githubLogin = passport.authenticate("github");
 
 // Github 에서 로그인 후, 돌아오는(WeTube 사이트로) 과정
 export const githubLoginCallback = async (_, __, profile, cb) => {
   console.log(profile);
   const {
-    _json: { id, avatar_url, name, email }
+    _json: { id, avatar_url: avatarUrl, name, email }
   } = profile;
 
   try {
@@ -66,7 +68,7 @@ export const githubLoginCallback = async (_, __, profile, cb) => {
       email,
       name,
       githubId: id,
-      avatarUrl: avatar_url
+      avatarUrl
     });
     return cb(null, newUser);
   } catch (error) {
@@ -78,13 +80,61 @@ export const postGithubLogIn = (req, res) => {
   res.redirect(routes.home);
 };
 
+// Facebook 인증
+export const facebookLogin = passport.authenticate("facebook");
+
+// 페이스북 라이브 상태 문제 해결되면 코드 수정해야함
+export const facebookLoginCallback = async (
+  _,
+  __,
+  profile,
+  cb
+) => {
+  const { _json: { id, name, email } } = profile;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      user.facebookId = id;
+      user.save();
+      return cb(null, user);
+    }
+    const newUser = await User.create({
+      email,
+      name,
+      facebookId: id,
+      avatarUrl: null
+    });
+    return cb(null, newUser);
+  } catch (error) {
+    return cb(error);
+  }
+};
+// 페이스북 라이브 상태 문제 해결되면 코드 수정해야함
+
+export const postFacebookLogin = (req, res) => {
+  res.redirect(routes.home);
+};
+
 export const logout = (req, res) => {
   req.logout();
   res.redirect(routes.home);
 };
 
-export const userDetail = (req, res) =>
-  res.render("userDetail", { pageTitle: "User Detail" });
+export const getMe = (req, res) => {
+  res.render("userDetail", { pageTitle: "User Detail", user: req.user });
+};
+
+export const userDetail = async (req, res) => {
+  const {
+    param: { id }
+  } = req;
+  try {
+    const user = await User.findById(id);
+    res.render("userDetail", { pageTitle: "User Detail", user });
+  } catch (error) {
+    res.redirect(routes.home);
+  }
+};
 
 export const editProfile = (req, res) =>
   res.render("editProfile", { pageTitle: "Edit Profile" });

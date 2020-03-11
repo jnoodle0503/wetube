@@ -9,7 +9,7 @@ export const localsMiddleware = (req, res, next) => {
 
   // 여기서 req.user 는 passport 패키지에서 설정해준 객체이다
   // 즉, passport 에서 request 객체에 user 라는 객체를 만들어주고 그안에 사용자의 로그인 정보가 담겨있다
-  res.locals.user = req.user || null;
+  res.locals.loggedUser = req.user || null;
 
   console.log(req.user);
   next();
