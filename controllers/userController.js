@@ -85,6 +85,7 @@ export const postGithubLogIn = (req, res) => {
   res.redirect(routes.home);
 };
 
+// 카카오톡 로그인 인증
 export const kakaoLogin = passport.authenticate("kakao");
 
 export const kakaoLoginCallback = async (_, __, kakaoProfile, cb) => {
