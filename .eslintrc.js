@@ -18,4 +18,7 @@ module.exports = {
   rules: {
     "no-console": "off"
   },
+  env: {
+    brower: true
+  }
 };

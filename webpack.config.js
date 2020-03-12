@@ -5,7 +5,7 @@ const ExtractCSS = require("extract-text-webpack-plugin");
 
 const MODE = process.env.WEBPACK_ENV; // 수동으로 받은 환경변수
 
-// 불어올 파일의 위치
+// 불러올 파일의 위치
 const ENTRY_FILE = path.resolve(__dirname, "assets", "js", "main.js");
 
 // 불러온 파일을 저장할 위치
