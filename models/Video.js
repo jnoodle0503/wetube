@@ -20,10 +20,18 @@ const VideoSchema = new mongoose.Schema({
   },
   comments: [
     {
-      type: mongoose.Schema.Types.ObjectId, // 테이블 내의 정보 ID
+      // 테이블 내의 정보 ID
+      // Comment 테이블의 ObjectId 를 저장함
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Comment"
     }
-  ]
+  ],
+  creator: {
+    // 테이블 내의 정보 ID
+    // User 테이블의 ObjectId 를 저장함
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
 });
 
 const model = mongoose.model("Video", VideoSchema);

@@ -8,7 +8,23 @@ const UserSchema = new mongoose.Schema({
   avatarUrl: String,
   facebookId: Number,
   githubId: Number,
-  kakaoId: Number
+  kakaoId: Number,
+  comments: [
+    {
+      // 테이블 내의 정보 ID
+      // Comment 테이블의 ObjectId 를 저장함
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }
+  ],
+  videos: [
+    {
+      // 테이블 내의 정보 ID
+      // Video 테이블의 ObjectId 를 저장함
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Video"
+    }
+  ]
 });
 
 // 스키마 생성 후 passport-local-mongoose 모듈을 사용하기 위해선

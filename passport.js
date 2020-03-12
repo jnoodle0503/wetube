@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 /* eslint-disable prettier/prettier */
 import passport from "passport";
 import GithubStrategy from "passport-github";
@@ -53,14 +54,15 @@ passport.use(
 // -----------------------------------  페이스북 격리  -----------------------------------------
 
 
-/*
-아래 코드를 사용했을 때 에러가 났다
-"Error: Failed to serialize user into session" 
-아마도 "passport-local-mongoose" 패키지의 버그같다고 한다
+
+//아래 코드를 사용했을 때 에러가 났다
+//"Error: Failed to serialize user into session" 
+//아마도 "passport-local-mongoose" 패키지의 버그같다고 한다
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-*/
 
+/*
 // 아래의 코드는 위의 코드와 동일한 의미를 가진다
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
+*/

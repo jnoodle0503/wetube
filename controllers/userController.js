@@ -7,7 +7,6 @@ export const getJoin = (req, res) => {
   res.render("join", { pageTitle: "Join" });
 };
 
-
 // 사용자 회원가입 DB 정보 생성
 export const postJoin = async (req, res, next) => {
   // console.log(req.body)
@@ -55,7 +54,6 @@ export const githubLogin = passport.authenticate("github");
 
 // Github 에서 로그인 후, 돌아오는(WeTube 사이트로) 과정
 export const githubLoginCallback = async (_, __, profile, cb) => {
-  console.log(profile);
   const {
     _json: { id, avatar_url: avatarUrl, name, email }
   } = profile;
@@ -128,13 +126,10 @@ export const postKakaoLogin = (req, res) => {
 export const facebookLogin = passport.authenticate("facebook");
 
 // 페이스북 라이브 상태 문제 해결되면 코드 수정해야함
-export const facebookLoginCallback = async (
-  _,
-  __,
-  profile,
-  cb
-) => {
-  const { _json: { id, name, email } } = profile;
+export const facebookLoginCallback = async (_, __, profile, cb) => {
+  const {
+    _json: { id, name, email }
+  } = profile;
   try {
     const user = await User.findOne({ email });
     if (user) {
@@ -174,7 +169,7 @@ export const getMe = (req, res) => {
 // 사용자 정보
 export const userDetail = async (req, res) => {
   const {
-    param: { id }
+    params: { id }
   } = req;
   try {
     const user = await User.findById(id);
@@ -185,9 +180,45 @@ export const userDetail = async (req, res) => {
 };
 
 // 프로필 수정
-export const editProfile = (req, res) =>
+export const getEditProfile = (req, res) =>
   res.render("editProfile", { pageTitle: "Edit Profile" });
 
+export const postEditProfile = async (req, res) => {
+  const {
+    body: { name, email },
+    file
+  } = req;
+  console.log(req.body);
+  try {
+    await User.findByIdAndUpdate(req.user.id, {
+      name,
+      email,
+      avatarUrl: file ? file.path : req.user.avatarUrl
+    });
+    res.redirect(routes.me);
+  } catch (error) {
+    res.redirect(routes.editProfile);
+  }
+};
+
 // 비밀번호 변경
-export const changePassword = (req, res) =>
+export const getChangePassword = (req, res) =>
   res.render("changePassword", { pageTitle: "Change Password" });
+
+export const postChangePassword = async (req, res) => {
+  const {
+    body: { oldPassword, newPassword, newPassword1 }
+  } = req;
+  try {
+    if (newPassword !== newPassword1) {
+      res.status(400);
+      res.redirect(`/users/${routes.changePassword}`);
+      return;
+    }
+    await req.user.changePassword(oldPassword, newPassword);
+    res.redirect(routes.me);
+  } catch (error) {
+    res.status(400);
+    res.redirect(`/users/${routes.changePassword}`);
+  }
+};

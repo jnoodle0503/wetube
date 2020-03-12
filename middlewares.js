@@ -2,6 +2,7 @@ import multer from "multer";
 import routes from "./routes";
 
 const multerVideo = multer({ dest: "uploads/videos/" });
+const multerAvatar = multer({ dest: "uploads/avatars" });
 
 export const localsMiddleware = (req, res, next) => {
   res.locals.siteName = "WeTube";
@@ -11,11 +12,13 @@ export const localsMiddleware = (req, res, next) => {
   // 즉, passport 에서 request 객체에 user 라는 객체를 만들어주고 그안에 사용자의 로그인 정보가 담겨있다
   res.locals.loggedUser = req.user || null;
 
-  console.log(req.user);
+  //console.log(req.user);
   next();
 };
 
 // 경로 제한을 위한 미들웨어
+
+// 로그아웃 상태에서만 들어갈 수 있음
 // 예를 들어, 로그인 상태에서 회원가입, 로그인 등등 경로 제한
 export const onlyPublic = (req, res, next) => {
   if (req.user) {
@@ -35,3 +38,4 @@ export const onlyPrivate = (req, res, next) => {
 };
 
 export const uploadVideo = multerVideo.single("videoFile");
+export const uploadAvatar = multerAvatar.single("avatar");
