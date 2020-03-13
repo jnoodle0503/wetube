@@ -29,6 +29,12 @@ const GITHUB_CALLBACK = "/auth/github/callback";
 const KAKAO = "/auth/kakao";
 const KAKAO_CALLBACK = "/oauth";
 
+// API
+const API = "/api";
+const REGISTER_VIEW = "/:id/view";
+const ADD_COMMENT = "/:id/comment";
+const DELETE_COMMENT = "/:commentId/delete";
+
 // -----------------------------------  페이스북 감옥  -----------------------------------------
 // Facebook
 const FB = "/auth/facebook";
@@ -80,7 +86,17 @@ const routes = {
   facebook: FB,
   facebookCallback: FB_CALLBACK,
   kakao: KAKAO,
-  kakaoCallback: KAKAO_CALLBACK
+  kakaoCallback: KAKAO_CALLBACK,
+  api: API,
+  registerView: REGISTER_VIEW,
+  addComment: ADD_COMMENT,
+  deleteComment: commentId => {
+    if (commentId) {
+      return `/api/${commentId}/delete`;
+    } else {
+      return DELETE_COMMENT;
+    }
+  }
 };
 
 export default routes;
