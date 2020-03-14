@@ -35,5 +35,7 @@ block content
                     li
                         span=comment.text
                         if loggedUser && comment.creator == loggedUser.id
-                            a(href=routes.deleteComment(comment.id))
-                                button ❌
+                            form.jsDeleteComment
+                                button.jsDeleteCmtBtn ❌
+                                input.commentId(type="hidden", value=comment.id)
+                                

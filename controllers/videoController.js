@@ -85,12 +85,14 @@ export const getEditVideo = async (req, res) => {
 
   try {
     const video = await Video.findById(id);
-    if (video.creator !== req.user.id) {
+    console.log(video);
+    if (video.creator != req.user.id) {
       throw Error();
     } else {
       res.render("editVideo", { pageTitle: `Edit ${video.title}`, video });
     }
   } catch (error) {
+    console.log(error);
     res.redirect(routes.home);
   }
 };
@@ -175,6 +177,8 @@ export const postAddComment = async (req, res) => {
   }
 };
 
+// 댓글 삭제
+
 export const deleteComment = async (req, res) => {
   const {
     params: { commentId }
@@ -183,14 +187,37 @@ export const deleteComment = async (req, res) => {
   try {
     // 비디오안에 댓글 삭제해야함
     // 댓글 삭제 api 처리해야함
-    const user = await User.findById(req.user.id);
-    const comment = await Comment.findById(commentId).populate("creator");
-    console.log(comment);
+
+    const user = await User.findById(req.user.id).populate("videos"); // 유저 테이블과 비디오테이블에서 댓글 제거를 위함
+    const video = await Video.find({}); // 전체 비디오에서 해당 유저의 댓글 삭제하기 위함
+    const comment = await Comment.findById(commentId).populate("creator"); // 댓글을 제거하는 유저 검사를 위한 코멘트 검색
+
+    //console.log(comment);
     if (comment.creator.id !== req.user.id) {
+      // 댓글을 제거하는 유저 검사
       throw Error();
     } else {
-      await Comment.findOneAndRemove({ _id: comment.id });
-      await user.comments.pop(comment);
+      await Comment.findOneAndRemove({ _id: comment.id }); // 코멘트 테이블에서 검색된 코멘트 삭제
+
+      const commentIndex = await user.comments.indexOf(comment.id);
+      await user.comments.splice(commentIndex, 1); // 해당 유저의 코멘트 배열 중 검색된 코멘트 삭제
+      user.save();
+
+      video.forEach(videoElement => {
+        for (const key in videoElement) {
+          if (key === "comments") {
+            videoElement[key].forEach(async element => {
+              if (element == comment.id) {
+                const index = videoElement[key].indexOf(comment.id);
+                const delVideoCmt = await Video.findById(videoElement.id);
+                delVideoCmt.comments.splice(index, 1);
+                delVideoCmt.save();
+                res.status(200);
+              }
+            });
+          }
+        }
+      });
     }
   } catch (error) {
     res.status(400);
